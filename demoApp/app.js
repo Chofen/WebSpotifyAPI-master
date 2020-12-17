@@ -20,9 +20,9 @@ const APIController = (function() {
         return data.access_token;
     }
     
-    const _getPlaylistByGenre = async (token, country) => {
+    const _getPlaylistByCountry = async (token, country) => {
 
-        const result = await fetch(`https://api.spotify.com/v1/search?q="Top%2050%20${country}&type=playlist&limit=1`, {
+        const result = await fetch(`https://api.spotify.com/v1/search?q="Top%2050%20${country}&type=playlist&limit=1&owner=spotifycharts`, {
             method: 'GET',
             headers: { 'Authorization' : 'Bearer ' + token}
         });
@@ -30,6 +30,8 @@ const APIController = (function() {
         const data = await result.json();
         return data.playlists.items;
     }
+
+    
 
     const _getTracks = async (token, tracksEndPoint) => {
 
@@ -69,8 +71,8 @@ const APIController = (function() {
             return _getToken();
         },
        
-        getPlaylistByGenre(token, genreId) {
-            return _getPlaylistByGenre(token, genreId);
+        getPlaylistByCountry(token, country) {
+            return _getPlaylistByCountry(token, country);
         },
         getTracks(token, tracksEndPoint) {
             return _getTracks(token, tracksEndPoint);
@@ -117,20 +119,31 @@ const UIController = (function() {
             const spotifyPrew = document.querySelector(DOMElements.spotifyPlayer)
             spotifyPrew.innerHTML = ''; // reset
             // create a inbedded spotify player and open the playlist
-            /*const html2 = `<iframe src="https://open.spotify.com/embed/playlist/${playlistID}" width="300" height="380"
+            const html = `<iframe src="https://open.spotify.com/embed/playlist/${playlistID}" width="300" height="380"
              frameborder="0"allowtransparency="true"
               allow="encrypted-media"></iframe>`;
-              */
-
-            const html = `<iframe src="https://open.spotify.com/embed/album/${playlistID}" width="300" height="380" frameborder="0"
-             allowtransparency="true" allow="encrypted-media"></iframe>`
+            
             spotifyPrew.insertAdjacentHTML('beforeend',html);
         },
 
+        createTracks(tracks, length){
+            const spotifyPrew = document.querySelector(DOMElements.spotifyPlayer)
+            spotifyPrew.innerHTML = ''; // reset    
+            for (i = 0; i < 5; i++) {
+                const html = `<iframe src="https://open.spotify.com/embed/track/${tracks[i]}"
+                 width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`
+                 spotifyPrew.insertAdjacentHTML('beforeend', html)
+            }
+        },
+
         // need method to create a track list group item 
-        createTrack(id, name) {
-            const html = `<a href="#" class="list-group-item list-group-item-action list-group-item-light" id="${id}">${name}</a>`;
-            document.querySelector(DOMElements.divSonglist).insertAdjacentHTML('beforeend', html);
+        createTrack(id) {
+            const spotifyPrew = document.querySelector(DOMElements.spotifyPlayer);
+            spotifyPrew.innerHTML = '';
+            console.log("ID= " + id);
+            const html = `<iframe src="https://open.spotify.com/embed/track/${id}"
+                 width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`
+                spotifyPrew.insertAdjacentHTML('beforeend', html)
         },
 
         
@@ -231,9 +244,17 @@ const APPController = (function(UICtrl, APICtrl) {
         const countryName = UICtrl.getCountry();
      
         // ge the playlist based on a genre
-        const playlist = await APICtrl.getPlaylistByGenre(token, countryName);       
+        const playlist = await(APICtrl.getPlaylistByCountry(token, countryName));  
+        console.log(playlist)     
         // create a playlist list item for every playlist returned
-        UICtrl.createPlaylist(playlist.id); // create spotify playlist
+        //playlist.forEach(p => UICtrl.createPlaylist(p.id)); // create spotify playlist
+        console.log("href= " + playlist[0].tracks.href);
+        
+        for (i = 0; i < 5; i++) {
+            const track = APICtrl.getTrack(token, playlist[0].tracks.href);
+            UICtrl.createTrack(track.id);
+        }
+    
         //get the token
         // get the playlist field
         //const playlistSelect = UICtrl.inputField().playlist;
