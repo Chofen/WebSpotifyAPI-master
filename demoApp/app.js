@@ -55,6 +55,15 @@ const APIController = (function() {
         return data;
     }
 
+    const _getWikipedia = async(endpoint) => {
+        const result = await fetch(`${endpoint}`, {
+            method: 'GET',
+        });
+
+        const data = await result.json();
+        return data;
+    }
+
     return {
         getToken() {
             return _getToken();
@@ -68,7 +77,7 @@ const APIController = (function() {
         },
         getTrack(token, trackEndPoint) {
             return _getTrack(token, trackEndPoint);
-        }
+        },
     }
 })();
 
@@ -78,7 +87,6 @@ const UIController = (function() {
 
     //object to hold references to html selectors
     const DOMElements = {
-        selectPlaylist: '#select_playlist',
         buttonSubmit: '#btn_submit',
         divSongDetail: '#song-detail',
         hfToken: '#hidden_token',
@@ -103,16 +111,20 @@ const UIController = (function() {
             }
         },
 
-        createPlaylist(text, value, playlistID) {
-            const html = `<option value="${value}">${text}</option>`;
-            document.querySelector(DOMElements.selectPlaylist).insertAdjacentHTML('beforeend', html);
+        createPlaylist(playlistID) {
+            //const html = `<option value="${value}">${text}</option>`;
+            //document.querySelector(DOMElements.selectPlaylist).insertAdjacentHTML('beforeend', html);
             const spotifyPrew = document.querySelector(DOMElements.spotifyPlayer)
             spotifyPrew.innerHTML = ''; // reset
-            const html2 = `<iframe src="https://open.spotify.com/embed/playlist/${playlistID}" width="300" height="380"
+            // create a inbedded spotify player and open the playlist
+            /*const html2 = `<iframe src="https://open.spotify.com/embed/playlist/${playlistID}" width="300" height="380"
              frameborder="0"allowtransparency="true"
-              allow="encrypted-media"></iframe>`
-            spotifyPrew.insertAdjacentHTML('beforeend',html2);
-              detailDiv.insertAdjacentHTML('beforeend', html)
+              allow="encrypted-media"></iframe>`;
+              */
+
+            const html = `<iframe src="https://open.spotify.com/embed/album/${playlistID}" width="300" height="380" frameborder="0"
+             allowtransparency="true" allow="encrypted-media"></iframe>`
+            spotifyPrew.insertAdjacentHTML('beforeend',html);
         },
 
         // need method to create a track list group item 
@@ -143,9 +155,13 @@ const UIController = (function() {
                 <label for="artist" class="form-label col-sm-12">By ${artist}:</label>
             </div> 
             `;
-
             detailDiv.insertAdjacentHTML('beforeend', html)
 
+
+        },
+
+        createWikipedia()
+        {
 
         },
 
@@ -159,7 +175,7 @@ const UIController = (function() {
         },
 
         resetPlaylist() {
-            this.inputField().playlist.innerHTML = '';
+            this.inputField().spotifyPlayer.innerHTML = '';
             this.resetTracks();
         },
         
@@ -176,6 +192,11 @@ const UIController = (function() {
             console.log(document.querySelector(DOMElements.inputCountry).value);
             return document.querySelector(DOMElements.inputCountry).value
         },
+
+        linkWikipedia()
+        {
+            // code
+        }
     }
 
 })();
@@ -212,34 +233,18 @@ const APPController = (function(UICtrl, APICtrl) {
         // ge the playlist based on a genre
         const playlist = await APICtrl.getPlaylistByGenre(token, countryName);       
         // create a playlist list item for every playlist returned
-        playlist.forEach(p => UICtrl.createPlaylist(p.name, p.tracks.href, p.id));
+        UICtrl.createPlaylist(playlist.id); // create spotify playlist
         //get the token
         // get the playlist field
-        const playlistSelect = UICtrl.inputField().playlist;
+        //const playlistSelect = UICtrl.inputField().playlist;
         // get track endpoint based on the selected playlist
-        const tracksEndPoint = playlistSelect.options[playlistSelect.selectedIndex].value;
+        //const tracksEndPoint = APICtrl.getListOfTracks();
         // get the list of tracks
-        const tracks = await APICtrl.getTracks(token, tracksEndPoint);
+        //const tracks = await APICtrl.getTracks(token, tracksEndPoint);
         // create a track list item
-        tracks.forEach(el => UICtrl.createTrack(el.track.href, el.track.name))
+        //tracks.forEach(el => UICtrl.createTrack(el.track.href, el.track.name))
         
     });
-
-
-    // create song selection click event listener
-    DOMInputs.tracks.addEventListener('click', async (e) => {
-        // prevent page reset
-        e.preventDefault();
-        UICtrl.resetTrackDetail();
-        // get the token
-        const token = UICtrl.getStoredToken().token;
-        // get the track endpoint
-        const trackEndpoint = e.target.id;
-        //get the track object
-        const track = await APICtrl.getTrack(token, trackEndpoint);
-        // load the track details
-        UICtrl.createTrackDetail(track.album.images[2].url, track.name, track.artists[0].name);
-    });    
 
     return {
         init() {
