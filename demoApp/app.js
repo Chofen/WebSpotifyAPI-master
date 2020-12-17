@@ -28,7 +28,7 @@ const APIController = (function() {
         });
 
         const data = await result.json();
-        return data.playlists.items;
+        return data.playlists.items[0];
     }
 
     
@@ -47,7 +47,7 @@ const APIController = (function() {
     }
 
     const _getTrack = async (token, trackEndPoint) => {
-
+            console.log("endpoint:" + trackEndPoint);
         const result = await fetch(`${trackEndPoint}`, {
             method: 'GET',
             headers: { 'Authorization' : 'Bearer ' + token}
@@ -137,17 +137,18 @@ const UIController = (function() {
         },
 
         // need method to create a track list group item 
-        createTrack(id) {
+        createTrack(trackID) {
             const spotifyPrew = document.querySelector(DOMElements.spotifyPlayer);
-            spotifyPrew.innerHTML = '';
-            console.log("ID= " + id);
-            const html = `<iframe src="https://open.spotify.com/embed/track/${id}"
+            const html = `<iframe src="https://open.spotify.com/embed/track/${trackID}"
                  width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`
                 spotifyPrew.insertAdjacentHTML('beforeend', html)
         },
 
-        
-
+        clearTracks()
+        {
+            const spotifyPrew = document.querySelector(DOMElements.spotifyPlayer);
+            spotifyPrew.innerHTML = '';
+        },
 
         // need method to create the song detail
         createTrackDetail(img, title, artist) {
@@ -245,13 +246,14 @@ const APPController = (function(UICtrl, APICtrl) {
      
         // ge the playlist based on a genre
         const playlist = await(APICtrl.getPlaylistByCountry(token, countryName));  
-        console.log(playlist)     
+        console.log(playlist.href + "/tracks");
         // create a playlist list item for every playlist returned
         //playlist.forEach(p => UICtrl.createPlaylist(p.id)); // create spotify playlist
-        console.log("href= " + playlist[0].tracks.href);
-        
+        //console.log("href= " + playlist[0].tracks[0]);
+       const tracks = await(APICtrl.getTracks(token, playlist.href + "/tracks"));
+    
         for (i = 0; i < 5; i++) {
-            const track = APICtrl.getTrack(token, playlist[0].tracks.href);
+            var track = tracks[i].track;
             UICtrl.createTrack(track.id);
         }
     
