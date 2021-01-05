@@ -94,7 +94,8 @@ const UIController = (function() {
         hfToken: '#hidden_token',
         divSonglist: '.song-list',
         inputCountry: '#tf_country',
-        spotifyPlayer: '#spotifyPlayer'
+        spotifyPlayer: '#spotifyPlayer',
+        map: '#map'
     };
 
     //public methods
@@ -109,7 +110,8 @@ const UIController = (function() {
                 submit: document.querySelector(DOMElements.buttonSubmit),
                 songDetail: document.querySelector(DOMElements.divSongDetail),
                 inputCountry: document.querySelector(DOMElements.tf_country),
-                spotifyPlayer: document.querySelector(DOMElements.spotifyPlayer)
+                spotifyPlayer: document.querySelector(DOMElements.spotifyPlayer),
+                mapView: document.querySelector(DOMElements.map)
             }
         },
 
@@ -171,6 +173,22 @@ const UIController = (function() {
             `;
             detailDiv.insertAdjacentHTML('beforeend', html)
 
+        },
+
+        createMap(countryName) {
+
+        const map = document.querySelector(DOMElements.map);
+        map.innerHTML = '';
+        const html =               
+            `<iframe
+            width="600"
+            height="450"
+            frameborder="0" style="border:0"
+            src="https://www.google.com/maps/embed/v1/place?key=
+            AIzaSyDOM4UOXcIRRErjQuoaZqmiYZ7lsvDstig  
+            &q=${countryName}" allowfullscreen>
+            </iframe>`
+            map.insertAdjacentHTML('beforeend', html);
 
         },
 
@@ -181,6 +199,7 @@ const UIController = (function() {
 
         resetTrackDetail() {
             this.inputField().songDetail.innerHTML = '';
+            this.inputField().spotifyPlayer.innerHTML = '';
         },
 
         resetTracks() {
@@ -205,11 +224,6 @@ const UIController = (function() {
         getCountry() {
             console.log(document.querySelector(DOMElements.inputCountry).value);
             return document.querySelector(DOMElements.inputCountry).value
-        },
-
-        linkWikipedia()
-        {
-            // code
         }
     }
 
@@ -247,25 +261,16 @@ const APPController = (function(UICtrl, APICtrl) {
         // ge the playlist based on a genre
         const playlist = await(APICtrl.getPlaylistByCountry(token, countryName));  
         console.log(playlist.href + "/tracks");
-        // create a playlist list item for every playlist returned
-        //playlist.forEach(p => UICtrl.createPlaylist(p.id)); // create spotify playlist
-        //console.log("href= " + playlist[0].tracks[0]);
        const tracks = await(APICtrl.getTracks(token, playlist.href + "/tracks"));
-    
+
+        UICtrl.resetTracks();
         for (i = 0; i < 5; i++) {
             var track = tracks[i].track;
             UICtrl.createTrack(track.id);
         }
-    
-        //get the token
-        // get the playlist field
-        //const playlistSelect = UICtrl.inputField().playlist;
-        // get track endpoint based on the selected playlist
-        //const tracksEndPoint = APICtrl.getListOfTracks();
-        // get the list of tracks
-        //const tracks = await APICtrl.getTracks(token, tracksEndPoint);
-        // create a track list item
-        //tracks.forEach(el => UICtrl.createTrack(el.track.href, el.track.name))
+
+        // Add an embedded google map with the selected country
+        UICtrl.createMap(countryName);
         
     });
 
@@ -280,6 +285,9 @@ const APPController = (function(UICtrl, APICtrl) {
 
 // will need to call a method to load the genres on page load
 APPController.init();
+
+
+
 
 
 
