@@ -93,7 +93,7 @@ const UIController = (function() {
         divSongDetail: '#song-detail',
         hfToken: '#hidden_token',
         divSonglist: '.song-list',
-        inputCountry: '#tf_country',
+        inputCountry: '#country',
         spotifyPlayer: '#spotifyPlayer',
         map: '#map'
     };
@@ -109,7 +109,7 @@ const UIController = (function() {
                 tracks: document.querySelector(DOMElements.divSonglist),
                 submit: document.querySelector(DOMElements.buttonSubmit),
                 songDetail: document.querySelector(DOMElements.divSongDetail),
-                inputCountry: document.querySelector(DOMElements.tf_country),
+                country: document.querySelector(DOMElements.inputCountry),
                 spotifyPlayer: document.querySelector(DOMElements.spotifyPlayer),
                 mapView: document.querySelector(DOMElements.map)
             }
