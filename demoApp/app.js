@@ -174,8 +174,9 @@ const UIController = (function() {
             detailDiv.insertAdjacentHTML('beforeend', html)
 
         },
-
-        createMap(countryName) {
+        // creates the Google Maps
+        createMap(countryName) 
+        {
 
         const map = document.querySelector(DOMElements.map);
         map.innerHTML = '';
@@ -200,6 +201,10 @@ const UIController = (function() {
         resetTrackDetail() {
             this.inputField().songDetail.innerHTML = '';
             this.inputField().spotifyPlayer.innerHTML = '';
+        },
+
+        resetCountry(){
+            
         },
 
         resetTracks() {
@@ -231,34 +236,25 @@ const UIController = (function() {
 
 const APPController = (function(UICtrl, APICtrl) {
 
-    // get input field object ref
     const DOMInputs = UICtrl.inputField();
-
     // get genres on page load
     const loadGenres = async () => {
         //get the token
         const token = await APICtrl.getToken();           
-        //store the token onto the page
         UICtrl.storeToken(token);
-        //get the genres
-         UICtrl.resetPlaylist();
-        //get the token that's stored on the page   
-        // get the genre id associated with the selected genre
+        UICtrl.resetPlaylist();
+        UICtrl.resetCountry();
+       
     }
 
-    // create genre change event listener
-
-
-    // create submit button click event listener
     DOMInputs.submit.addEventListener('click', async (e) => {
-        // prevent page reset
         e.preventDefault();
         // clear tracks
         UICtrl.resetTracks();
         const token = UICtrl.getStoredToken().token; 
         const countryName = UICtrl.getCountry();
      
-        // ge the playlist based on a genre
+        // get the playlist based on a genre
         const playlist = await(APICtrl.getPlaylistByCountry(token, countryName));  
         console.log(playlist.href + "/tracks");
        const tracks = await(APICtrl.getTracks(token, playlist.href + "/tracks"));
