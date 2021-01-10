@@ -100,22 +100,27 @@ function initMap()
             position: new google.maps.LatLng(locations[i][1], locations[i][2]),
             map: map
           });
-          var playlist = getPlaylistByCountry(token, locations[i][0]);
+          const playlist = await getPlaylistByCountry(token, locations[i][0]);
+          const wiki = await getWikitext(locations[i][0])
         // add playlists into an array
-        //const tracks = await(getTracks(token, playlist.href + "/tracks"));
           google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
-              infowindow.setContent(`<iframe src="https://open.spotify.com/embed/playlist/${playlist.id}" 
-              width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
+              infowindow.setContent(`
+              <img src="${wiki.thumbnail.source}" alt="alternatetext">
+              <div>
+              ${wiki.extract}
+              </div>
+              <div>
+              <iframe src="https://open.spotify.com/embed/playlist/${playlist.id}" 
+              //width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
+              </div>`);
                
-              //infowindow.setContent(locations[i][0])
               infowindow.open(map, marker);
             }
           })(marker, i));
       }
     }
 
-    // private methods
     const getToken = async () => {
 
         const result = await fetch('https://accounts.spotify.com/api/token', {
@@ -136,9 +141,18 @@ function initMap()
             method: 'GET',
             headers: { 'Authorization' : 'Bearer ' + token}
         });
-
         const data = await result.json();
+        console.log(data.playlists.items[0]);
         return data.playlists.items[0];
+    }    
+
+    const getWikitext = async (country) => { 
+        const result = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${country}`, {
+            method: 'GET',
+        });
+        const data = await result.json();
+        console.log(data);
+        return data;
     }    
 
     const getTracks = async (token, tracksEndPoint) => {
