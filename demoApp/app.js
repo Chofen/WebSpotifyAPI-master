@@ -5,7 +5,7 @@ function initMap()
     const clientSecret = '02225197ebe24b5dbc46cbae56a40ef9';
 
     const australia = { lat: -25.344, lng: 131.036 };
-    const sweden = { lat: 60, lng: 18};
+    
     var playlists = [];
     var locations = [
     
@@ -75,11 +75,6 @@ function initMap()
         ['Argentina', -34.6, -63.3]
     
       ];
-      const DOMElements = {
-          // ADD HTML ELEMENTS HERE
-        hfToken: '#hidden_token',
-       
-    };
 
     const map = new google.maps.Map(document.getElementById("map"), {
       zoom: 4,
@@ -89,7 +84,6 @@ function initMap()
     init = async () => {
 
         const token = await getToken();           
-        storeToken(token);
 
         var infowindow = new google.maps.InfoWindow();
 
@@ -154,50 +148,5 @@ function initMap()
         console.log(data);
         return data;
     }    
-
-    const getTracks = async (token, tracksEndPoint) => {
-
-        const limit = 5;
-
-        const result = await fetch(`${tracksEndPoint}?limit=${limit}`, {
-            method: 'GET',
-            headers: { 'Authorization' : 'Bearer ' + token}
-        });
-
-        const data = await result.json();
-        return data.items;
-    }
-
-    const getTrack = async (token, trackEndPoint) => {
-            console.log("endpoint:" + trackEndPoint);
-        const result = await fetch(`${trackEndPoint}`, {
-            method: 'GET',
-            headers: { 'Authorization' : 'Bearer ' + token}
-        });
-
-        const data = await result.json();
-        return data;
-    }
-
-    const getWikipedia = async(endpoint) => {
-        const result = await fetch(`${endpoint}`, {
-            method: 'GET',
-        });
-
-        const data = await result.json();
-        return data;
-    }
-    
-    function storeToken(value) 
-    {
-        document.querySelector(DOMElements.hfToken).value = value;
-    }
-
-    function getStoredToken() 
-    {
-        return {
-            token: document.querySelector(DOMElements.hfToken).value
-        }
-    }
     init();
 }
