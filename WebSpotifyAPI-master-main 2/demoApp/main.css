@@ -1,0 +1,46 @@
+/* Set the size of the div element that contains the map */
+#map {
+    height: 700px;
+    width: 600px;
+    margin: auto;
+    width: 50%;
+    border: 3px solid white;
+    padding: 10px; 
+  }
+  body {
+
+    background-color: lightslategray;
+  }
+
+  h1{
+    color: white;
+    margin: auto;
+    justify-content: center;
+    display: flex;
+    margin: auto;
+    padding: 20px;
+    }
+  
+
+  .map-info-window{
+    background-color: green;
+    
+  }
+  .flagga{
+    float: right;
+    width: 50%;
+    height: 25%;
+
+  }
+  .spotify{
+    float: left;
+    width: 50%
+  
+  }
+  .text{
+    float: right;;
+    width: 50%;
+    height: 70%;
+    
+  }
+  
